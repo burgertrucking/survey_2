@@ -4,11 +4,10 @@
 #include "SDL.h"
 
 #ifdef ENABLE_HOT_RELOADING
-	#define HOTRELOAD_C
-	#include "hotreload.c"
+	#define HOTRELOAD_IMPL
+	#include "hotreload.h"
 	#include "game.c"
 	#include "statusflag.h"
-	#define BITFLAG_C
 	#include "bitflag.c"
 #else
 	#define GAME_STANDALONE /* include the implementation in a static build */

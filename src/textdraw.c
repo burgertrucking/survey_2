@@ -1,35 +1,6 @@
-/* header */
-#ifndef TEXTDRAW_H
-#define TEXTDRAW_H
-
-#include "SDL.h"
-#include "types.c"
-
-/* struct for bitmap fonts */
-typedef struct Fonts
-{
-    SDL_Surface* lwMain;
-    SDL_Surface* dwMain;
-} Fonts;
-
-typedef enum FontType
-{
-    FONT_MAIN_LW,
-    FONT_MAIN_DW,
-} FontType;
-
-int InitFonts(Fonts* fonts);
-
-/* Draw a message at a given position */
-int DrawText(String msg, Fonts* fontImgs, SDL_Surface* screen, FontType font, Vec2 pos);
-
-#endif
-
-/* implementation */
-#ifdef TEXTDRAW_C
-
+#include "textdraw.h"
 #include <stdio.h>
-#include "utils.c"
+#include "utils.h"
 
 enum
 {
@@ -106,5 +77,3 @@ static SDL_Rect GetCharRect(const char letter)
     int row = (letter - col)/FONT_IMG_COLS;
     return (SDL_Rect){ col*TEXT_CHAR_WIDTH, row*TEXT_CHAR_HEIGHT, TEXT_CHAR_WIDTH, TEXT_CHAR_HEIGHT };
 }
-
-#endif

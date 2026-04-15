@@ -2,11 +2,11 @@
 #ifndef HOTRELOAD_H
 #define HOTRELOAD_H
 
-#ifdef HOTRELOAD_C
+#ifdef HOTRELOAD_IMPL
 #define HDEF static
 #else
 #define HDEF extern
-#endif /* HOTRELOAD_C */
+#endif /* HOTRELOAD_IMPL */
 
 #include "game.c"
 
@@ -46,7 +46,7 @@ HDEF int HandleHotReload(void);
 #endif /* HOTRELOAD_H */
 
 /* implementation */
-#ifdef HOTRELOAD_C
+#ifdef HOTRELOAD_IMPL
 
 #include "SDL.h"
 #include <stdio.h>
@@ -171,4 +171,4 @@ HDEF int HandleHotReload(void)
     return 0;
 }
 
-#endif /* HOTRELOAD_C */
+#endif /* HOTRELOAD_IMPL */

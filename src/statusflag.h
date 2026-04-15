@@ -16,4 +16,5 @@ typedef enum StatusFlag
     STATUS_IS_DARK_WORLD = 1 << 7,
     STATUS_IS_CUTSCENE = 1 << 8,
 } StatusFlag;
+
 #endif /* STATUSFLAG_H */

@@ -1,28 +1,15 @@
 /* header */
-#ifndef GAME_H
-#define GAME_H
+#ifndef GAME_C
+#define GAME_C
 
 #include "SDL.h"
-#include "input.c"
-#include "player.c"
-#include "textdraw.c"
-#include "room.c"
-#include "textbox.c"
+#include "input.h"
+#include "player.h"
+#include "textdraw.h"
+#include "room.h"
+#include "textbox.h"
 #include "statusflag.h"
-
-/* anonymous enum for constants */
-enum
-{
-    RES_WIDTH = 640,
-    RES_HEIGHT = 480,
-    WORLD_RES_WIDTH = 320,
-    WORLD_RES_HEIGHT = 240,
-    SCREEN_BPP = 0, /* native colour depth */
-    TICKS_PER_SECOND = 30,
-    DEFAULT_VIDEO_FLAGS = SDL_SWSURFACE|SDL_ANYFORMAT, /* NOTE may eventually let machine decide hw vs sw rather than hardcoding */
-    WINDOW_RESIZABLE = SDL_RESIZABLE|DEFAULT_VIDEO_FLAGS,
-    WINDOW_FULLSCREEN = SDL_FULLSCREEN|DEFAULT_VIDEO_FLAGS,
-};
+#include "constants.h"
 
 typedef struct UserConfig
 {
@@ -54,7 +41,7 @@ int InitGame(GameState* state);
 #endif
 int UpdateDrawFrame(GameState* state);
 
-#endif /* GAME_H */
+#endif /* GAME_C */
 
 /* implementation */
 #ifdef GAME_STANDALONE /* should be defined when building game.c as a dll */
