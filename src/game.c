@@ -53,7 +53,7 @@ int UpdateDrawFrame(GameState* state);
 enum
 {
     TICK_RATE = 1000 / TICKS_PER_SECOND, /* NOTE rounding truncated because SDL_Delay() only takes integers */
-    QUIT_TIMER_DURATION = 1*TICKS_PER_SECOND,
+    QUIT_TIMER_DURATION = 1*TICKS_PER_SECOND
 };
 
 typedef struct RenderInfo
@@ -81,16 +81,19 @@ static int drawVScreenScaled(GameState* state);
 #endif
 int InitGame(GameState* state)
 {
+    int err;
+    SDL_PixelFormat pf;
+
     /* TODO load player config */
     state->cfg.keys = GetDefaultKeyBinds();
     quitTimer = 0;
 
-    int err = setVideoRes(state, RES_WIDTH, RES_HEIGHT, WINDOW_RESIZABLE);
+    err = setVideoRes(state, RES_WIDTH, RES_HEIGHT, WINDOW_RESIZABLE);
 	if (err) return err;
 	SDL_WM_SetCaption("SURVEY_PROGRAM_202X", NULL);
 	SDL_EnableKeyRepeat(0, 0);
     /* pixel format for current monitor, used for creating game's virtual screens */
-	SDL_PixelFormat pf = *state->screen->format;
+	pf = *state->screen->format;
 	state->vScreen240 = SDL_CreateRGBSurface(SDL_SWSURFACE, WORLD_RES_WIDTH, WORLD_RES_HEIGHT,
 	                                         pf.BitsPerPixel, pf.Rmask, pf.Gmask, pf.Bmask, pf.Amask);
 	state->vScreen480 = SDL_CreateRGBSurface(SDL_SWSURFACE, RES_WIDTH, RES_HEIGHT,
@@ -103,75 +106,75 @@ int InitGame(GameState* state)
     err = InitTextbox(&state->textbox);
     /* TEMP init room walls (InitRoom() doesn't handle this) */
     /* NOTE though these sizes are very close to exact, they are still too fat for the player to fit through */
-    state->room = (Room){0}; /* zero initialise room to prevent UB */
     state->room.wallsLen = 16;
-    state->room.walls[0] = (Rect){ 69, 123, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[1] = (Rect){ 69, 154, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[2] = (Rect){ 69, 188, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[3] = (Rect){ 139, 188, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[4] = (Rect){ 139, 154, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[5] = (Rect){ 139, 123, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[6] = (Rect){ 206, 123, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[7] = (Rect){ 206, 154, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[8] = (Rect){ 206, 188, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE };
-    state->room.walls[9] = (Rect){ 101, 89, 4.63f*TILE_SIZE, 0.79f*TILE_SIZE };
-    state->room.walls[10] = (Rect){ 18, 23, TILE_SIZE, 10.63f*TILE_SIZE };
-    state->room.walls[11] = (Rect){ 38, 218, 12.3f*TILE_SIZE, 0.85f*TILE_SIZE };
-    state->room.walls[12] = (Rect){ 286, 23, 0.85f*TILE_SIZE, 10.63f*TILE_SIZE };
-    state->room.walls[13] = (Rect){ 22, 3, 13.96f*TILE_SIZE, 0.95f*TILE_SIZE };
-    state->room.walls[14] = (Rect){ 269, 52, TILE_SIZE, TILE_SIZE };
-    state->room.walls[15] = (Rect){ 38, 52, 9.89f*TILE_SIZE, TILE_SIZE };
+    state->room.walls[0] = NewRect(69, 123, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[1] = NewRect(69, 154, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[2] = NewRect(69, 188, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[3] = NewRect(139, 188, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[4] = NewRect(139, 154, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[5] = NewRect(139, 123, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[6] = NewRect(206, 123, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[7] = NewRect(206, 154, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[8] = NewRect(206, 188, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
+    state->room.walls[9] = NewRect(101, 89, 4.63f*TILE_SIZE, 0.79f*TILE_SIZE);
+    state->room.walls[10] = NewRect(18, 23, TILE_SIZE, 10.63f*TILE_SIZE);
+    state->room.walls[11] = NewRect(38, 218, 12.3f*TILE_SIZE, 0.85f*TILE_SIZE);
+    state->room.walls[12] = NewRect(286, 23, 0.85f*TILE_SIZE, 10.63f*TILE_SIZE);
+    state->room.walls[13] = NewRect(22, 3, 13.96f*TILE_SIZE, 0.95f*TILE_SIZE);
+    state->room.walls[14] = NewRect(269, 52, TILE_SIZE, TILE_SIZE);
+    state->room.walls[15] = NewRect(38, 52, 9.89f*TILE_SIZE, TILE_SIZE);
     /* TEMP init room slopes */
     /* these weren't in the original game and are only here for testing */
     state->room.slopesLen = 4;
-    state->room.slopes[0] = (Slope){ (Vec2){ 266, 198 }, SLOPE_BOTTOM_RIGHT };
+    state->room.slopes[0].pos = NewVec2(266, 198);
+    state->room.slopes[0].corner = SLOPE_BOTTOM_RIGHT;
     slopegfx = LoadImage("res-temp/slope.png");
     /* TEMP init room interactables */
     /* only some of them used for testing */
     state->room.interactablesLen = 5;
     /* clock */
-    state->room.interactables[0].bbox = (Rect){ 211, 52, 0.9473684*TILE_SIZE, 0.9*TILE_SIZE };
+    state->room.interactables[0].bbox = NewRect(211, 52, 0.9473684*TILE_SIZE, 0.9*TILE_SIZE);
     state->room.interactables[0].msgsLen = 2;
     state->room.interactables[0].msgs[0] = 0;
     state->room.interactables[0].msgs[1] = 9;
-    state->room.msgs[0].msg = (String){ "* (You checked the time.)", 25 };
+    state->room.msgs[0].msg = NewString("* (You checked the time.)");
     state->room.msgs[0].next = 1;
-    state->room.msgs[1].msg = (String){ "* (... It seems to not be time\n  for class.)", 44 };
+    state->room.msgs[1].msg = NewString("* (... It seems to not be time\n  for class.)");
     state->room.msgs[1].next = -1;
-    state->room.msgs[9].msg = (String){ "* (You wonder if they even hold\n  classes here.)", 48 };
+    state->room.msgs[9].msg = NewString("* (You wonder if they even hold\n  classes here.)");
     state->room.msgs[9].next = -1;
     /* flowers */
-    state->room.interactables[1].bbox = (Rect){ 101, 76, 0.55*TILE_SIZE, 0.368421*TILE_SIZE };
+    state->room.interactables[1].bbox = NewRect(101, 76, 0.55*TILE_SIZE, 0.368421*TILE_SIZE);
     state->room.interactables[1].msgsLen = 2;
     state->room.interactables[1].msgs[0] = 2;
     state->room.interactables[1].msgs[1] = 8;
-    state->room.msgs[2].msg = (String){ "* (There would normally be a\n  bunch of roses here, but it\n  seems the dev is lazy.)", 84 };
+    state->room.msgs[2].msg = NewString("* (There would normally be a\n  bunch of roses here, but it\n  seems the dev is lazy.)");
     state->room.msgs[2].next = -1;
-    state->room.msgs[8].msg = (String){ "* (What an asshole.)", 20 };
+    state->room.msgs[8].msg = NewString("* (What an asshole.)");
     state->room.msgs[8].next = -1;
     /* computer */
-    state->room.interactables[2].bbox = (Rect){ 165, 79, 0.9*TILE_SIZE, 0.45*TILE_SIZE };
+    state->room.interactables[2].bbox = NewRect(165, 79, 0.9*TILE_SIZE, 0.45*TILE_SIZE);
     state->room.interactables[2].msgsLen = 1;
     state->room.interactables[2].msgs[0] = 3;
-    state->room.msgs[3].msg = (String){ "* (The computer is turned off.)", 31 };
+    state->room.msgs[3].msg = NewString("* (The computer is turned off.)");
     state->room.msgs[3].next = 4;
-    state->room.msgs[4].msg = (String){ "* (You felt like no matter what\n  you tried, you would never be\n  see what's on the monitor.)", 93 };
+    state->room.msgs[4].msg = NewString("* (You felt like no matter what\n  you tried, you would never be\n  see what's on the monitor.)");
     state->room.msgs[4].next = -1;
     /* posters */
-    state->room.interactables[3].bbox = (Rect){ 45, 47, TILE_SIZE, TILE_SIZE };
+    state->room.interactables[3].bbox = NewRect(45, 47, TILE_SIZE, TILE_SIZE);
     state->room.interactables[3].msgsLen = 1;
     state->room.interactables[3].msgs[0] = 5;
-    state->room.msgs[5].msg = (String){ "* (Looks like motivational quotes\n  from various literature.)", 61 };
+    state->room.msgs[5].msg = NewString("* (Looks like motivational quotes\n  from various literature.)");
     state->room.msgs[5].next = 6;
-    state->room.msgs[6].msg = (String){ "* \"Try your best, Astral Wolf!\"\n* \"Even in your darkest hour...\"", 64 };
+    state->room.msgs[6].msg = NewString("* \"Try your best, Astral Wolf!\"\n* \"Even in your darkest hour...\"");
     state->room.msgs[6].next = 7;
-    state->room.msgs[7].msg = (String){ "* (...that one seems to be from\n  a video game.)", 48 };
+    state->room.msgs[7].msg = NewString("* (...that one seems to be from\n  a video game.)");
     state->room.msgs[7].next = -1;
     /* the curious case of the missing doorway */
-    state->room.interactables[4].bbox = (Rect){ 235, 52, 1.7*TILE_SIZE, TILE_SIZE };
+    state->room.interactables[4].bbox = NewRect(235, 52, 1.7*TILE_SIZE, TILE_SIZE);
     state->room.interactables[4].msgsLen = 1;
     state->room.interactables[4].msgs[0] = 10;
-    state->room.msgs[10].msg = (String){ "* (You wonder where the heck the\n  door went.)", 46 };
+    state->room.msgs[10].msg = NewString("* (You wonder where the heck the\n  door went.)");
     state->room.msgs[10].next = -1;
     InitRoom(&state->room, "res/rip/bg/alphysclass.png", ROOM_SHEET_WHOLE);
 
@@ -183,8 +186,9 @@ int InitGame(GameState* state)
 #endif
 int UpdateDrawFrame(GameState* state)
 {
-    rinfo.start = SDL_GetTicks();
     int err = 0;
+
+    rinfo.start = SDL_GetTicks();
 
     /* Update */
     err = updateGame(state);
@@ -244,6 +248,8 @@ static int drawGame(GameState* state)
 {
     /* TODO decompose into more granluar functions (eg drawing per screen, drawing gizmos) */
     int err = 0;
+    char ftstrData[64];
+    String frameTimeStr;
 
     /* vscreen240 (world) */
     /* TODO handle drawing room depending on screen size (some are optimised for 480p) */
@@ -256,25 +262,24 @@ static int drawGame(GameState* state)
         err = DrawPlayerGizmos(&state->player, state->vScreen240);
     }
     /* TEMP draw slope graphic */
-    BlitSurfaceCoords(slopegfx, NULL, state->vScreen240, (Vec2){266, 198});
+    BlitSurfaceCoords(slopegfx, NULL, state->vScreen240, NewVec2(266, 198));
 
     /* vscreen480 (game) */
     /* scale vscreen240 to size of vscreen480 */
-    err = BlitSurfaceScaled(state->vScreen240, NULL, state->vScreen480, (Vec2){0}, (Vec2){2.0f, 2.0f});
+    err = BlitSurfaceScaled(state->vScreen240, NULL, state->vScreen480, Vec2Zero(), NewVec2(2.0f, 2.0f));
     /* TEMP checking if text can be drawn */
     /* TEMP draw fps */
-    char ftstrData[64];
     sprintf(ftstrData, "FPS: %.3f\nRender time: %u ms\n(target < %u)", rinfo.fps, rinfo.renderTime, TICK_RATE);
-    String frameTimeStr = (String) { ftstrData, 64 };
+    frameTimeStr = NewString(ftstrData);
     if (CheckFlag(state->statusFlags, STATUS_DRAW_FPS))
-        err = DrawText(frameTimeStr, &state->fonts, state->vScreen480, FONT_MAIN_DW, (Vec2){0});
+        err = DrawText(frameTimeStr, &state->fonts, state->vScreen480, FONT_MAIN_DW, Vec2Zero());
     err = DrawTextbox(&state->textbox, state->room.msgs, CheckFlag(state->statusFlags, STATUS_IS_DARK_WORLD), &state->fonts, state->vScreen480);
     /* TEMP draw quitting if escape is held */
     /* TODO add and use the quitting font, or just hardcode it as an image to draw */
     if (CheckFlag(state->statusFlags, STATUS_QUIT_KEY_HELD))
     {
-        String quitText = (String){ "QUITTING...", sizeof("QUITTING...") };
-        DrawText(quitText, &state->fonts, state->vScreen480, FONT_MAIN_DW, (Vec2){0});
+        String quitText = NewString("QUITTING...");
+        DrawText(quitText, &state->fonts, state->vScreen480, FONT_MAIN_DW, Vec2Zero());
     }
 
     /* screen (the actual window) */
@@ -290,18 +295,22 @@ static void handleEvents(GameState* state)
 {
     while (SDL_PollEvent(&state->event))
     {
+        SDLKey key;
+
         switch (state->event.type)
         {
             case SDL_QUIT:
                 SetFlag(&state->statusFlags, STATUS_QUIT);
             break;
 
-            SDL_ResizeEvent re;
             case SDL_VIDEORESIZE:
+            {
+                SDL_ResizeEvent re;
                 re = state->event.resize;
                 /* ignore resize events to the current res (prevents fullscreening from undoing itself) */
                 if (state->screen->w != re.w && state->screen->h != re.h)
                     setVideoRes(state, re.w, re.h, WINDOW_RESIZABLE);
+            }
             break;
 
             case SDL_KEYDOWN:
@@ -312,7 +321,6 @@ static void handleEvents(GameState* state)
                         SetFlag(&state->statusFlags, STATUS_QUIT_KEY_HELD);
                     break;
 
-                    SDL_Rect** modes;
                     case SDLK_F4:
                         if (CheckFlag(state->statusFlags, STATUS_FULLSCREEN))
                         {
@@ -322,6 +330,7 @@ static void handleEvents(GameState* state)
                         }
                         else
                         {
+                            SDL_Rect** modes;
                             SetFlag(&state->statusFlags, STATUS_FULLSCREEN);
                             modes = SDL_ListModes(NULL, SDL_FULLSCREEN);
                             /* TEMP hardcoded to highest res */
@@ -422,7 +431,7 @@ static void handleEvents(GameState* state)
         /* handle player input (done here since switch statements must use compile time constants) */
 
         /* check for key down or key up events */
-        SDLKey key = state->event.key.keysym.sym;
+        key = state->event.key.keysym.sym;
         if (state->event.type == SDL_KEYDOWN)
         {
             if (key == state->cfg.keys.down)
@@ -564,7 +573,7 @@ static int drawVScreenScaled(GameState* state)
         }
         resized = SDL_FALSE;
     }
-    return BlitSurfaceScaled(state->vScreen480, NULL, state->screen, pos, (Vec2){scale, scale});
+    return BlitSurfaceScaled(state->vScreen480, NULL, state->screen, pos, NewVec2(scale, scale));
 }
 
 #endif /* GAME_STANDALONE */
