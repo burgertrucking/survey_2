@@ -43,7 +43,7 @@ enum
     PLAYER_RUN_LONG_SPEED_DW = PLAYER_WALK_SPEED_BASE + 3,
 
     PLAYER_WALK_FPS = 4,
-    PLAYER_RUN_FPS = 8,
+    PLAYER_RUN_FPS = 8
 };
 
 static Rect calcCheckBbox(Player* p);
@@ -59,8 +59,8 @@ int InitPlayer(Player* p)
     }
     p->animFrame = 0;
     p->facing = PLAYER_FACE_DOWN;
-    p->pos = (Vec2){ 260, 110 }; /* TEMP these are hardcoded for the classroom */
-    p->bbox = (Rect){ p->pos.x, p->pos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT };
+    p->pos = NewVec2(260, 110); /* TEMP these are hardcoded for the classroom */
+    p->bbox = NewRect(p->pos.x, p->pos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT);
     p->checkBbox = calcCheckBbox(p);
     p->runCount = 0;
     return 0;
@@ -68,15 +68,19 @@ int InitPlayer(Player* p)
 
 void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* status)
 {
-	SDL_bool isCutscene = CheckFlag(*status, STATUS_IS_CUTSCENE);
-	SDL_bool isDarkWorld = CheckFlag(*status, STATUS_IS_DARK_WORLD);
+	SDL_bool isCutscene, isDarkWorld, isMoving;
+	int moveSpeed;
+	Vec2 dir, dp, newPos;
+	int i;
+
+	isCutscene = CheckFlag(*status, STATUS_IS_CUTSCENE);
+	isDarkWorld = CheckFlag(*status, STATUS_IS_DARK_WORLD);
 	/* STUB just don't update player when in cutscene */
 	/* consider using fsm instead for this */
 	if (isCutscene) return;
 
     /* handle inputs */
     p->isRunning = CheckVInput(vPad, VKEY_CANCEL_HELD);
-    int moveSpeed;
     if (p->isRunning)
     {
     	if (p->runCount < 10) moveSpeed = (isDarkWorld)? PLAYER_RUN_START_SPEED_DW : PLAYER_RUN_START_SPEED_LW;
@@ -84,23 +88,22 @@ void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* statu
     	else moveSpeed = (isDarkWorld)? PLAYER_RUN_SPEED_DW : PLAYER_RUN_SPEED_LW;
     }
     else moveSpeed = (isDarkWorld)? PLAYER_WALK_SPEED_DW : PLAYER_WALK_SPEED_LW;
-    Vec2 dir = (Vec2){0};
+    dir = Vec2Zero();
     if (CheckVInput(vPad, VKEY_DOWN_HELD)) dir.y = 1;
     if (CheckVInput(vPad, VKEY_UP_HELD)) dir.y = -1;
     if (CheckVInput(vPad, VKEY_RIGHT_HELD)) dir.x = 1;
     if (CheckVInput(vPad, VKEY_LEFT_HELD)) dir.x = -1;
 
     /* handle movement */
-    SDL_bool isMoving = SDL_FALSE;
-    Vec2 dp = Vec2Scale(dir, moveSpeed);
-    Vec2 newPos = Vec2Add(p->pos, dp);
-    int i;
+    isMoving = SDL_FALSE;
+    dp = Vec2Scale(dir, moveSpeed);
+    newPos = Vec2Add(p->pos, dp);
     if (!p->noclip)
     {
-	    Rect newBbox = (Rect){ newPos.x, newPos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT };
+	    Rect newBbox = NewRect(newPos.x, newPos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT);
 	    /* split bboxes into xy components for granularised collision detection */
-	    Rect newBboxX = (Rect){ newPos.x, p->pos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT };
-	    Rect newBboxY = (Rect){ p->pos.x, newPos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT };
+	    Rect newBboxX = NewRect(newPos.x, p->pos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT);
+	    Rect newBboxY = NewRect(p->pos.x, newPos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT);
 	    for (i = 0; i < room->wallsLen; ++i)
 	    {
 			SDL_bool hitX = RectCheckCollisions(newBboxX, room->walls[i]);
@@ -144,13 +147,15 @@ void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* statu
 	    {
 	    	Slope s = room->slopes[i];
 	    	/* NOTE unsure if this bbox should be baked directly into the slope struct or calculated at runtime here */
-	    	Rect sloperect = (Rect){ s.pos.x, s.pos.y, TILE_SIZE, TILE_SIZE };
+	    	Rect sloperect = NewRect(s.pos.x, s.pos.y, TILE_SIZE, TILE_SIZE);
 	    	/* TEMP collision checking */
 	    	/* TODO move to its own function (in room.c or here?) */
 	    	if (RectCheckCollisions(newBbox, sloperect))
 	    	{
+	    		Vec2 hypA, hypB, rightA, rightB, bottomA, bottomB;
+	    		SDL_bool rightCollided, bottomCollided;
+
 	    		printf("UpdatePlayer: detected bbox is in slope tile at <%.2f, %.2f>, with slope %i (type %i)\n", s.pos.x, s.pos.y, i, s.corner);
-	    		Vec2 hypA, hypB;
 	    		switch (room->slopes[i].corner)
 	    		{
 	    			case SLOPE_TOP_LEFT:
@@ -170,12 +175,12 @@ void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* statu
 	    		}
 	    		/* TEMP currently hardcoed to handling bottom right collisions only */
 	    		/* (player bbox's right and bottom sides) */
-	    		Vec2 rightA = (Vec2){ newBbox.x + newBbox.w, newBbox.y };
-	    		Vec2 rightB = (Vec2){ newBbox.x + newBbox.w, newBbox.y + newBbox.h };
-	    		Vec2 bottomA = (Vec2){ newBbox.x, newBbox.y + newBbox.h };
-	    		Vec2 bottomB = (Vec2){ newBbox.x + newBbox.w, newBbox.y + newBbox.h };
-	    		SDL_bool rightCollided = LineCheckCollisions(hypA, hypB, rightA, rightB);
-	    		SDL_bool bottomCollided = LineCheckCollisions(hypA, hypB, bottomA, bottomB);
+	    		rightA = NewVec2(newBbox.x + newBbox.w, newBbox.y);
+	    		rightB = NewVec2(newBbox.x + newBbox.w, newBbox.y + newBbox.h);
+	    		bottomA = NewVec2(newBbox.x, newBbox.y + newBbox.h);
+	    		bottomB = NewVec2(newBbox.x + newBbox.w, newBbox.y + newBbox.h);
+	    		rightCollided = LineCheckCollisions(hypA, hypB, rightA, rightB);
+	    		bottomCollided = LineCheckCollisions(hypA, hypB, bottomA, bottomB);
 	    		if (rightCollided && bottomCollided)
 	    		{
 	    			/* TODO move to its own function, this is general enough to be used for the rectangle walls */
@@ -188,11 +193,13 @@ void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* statu
 
 	    			if (p->facing == PLAYER_FACE_RIGHT || p->facing == PLAYER_FACE_DOWN) /* sliding isn't calculated when not facing slope */
 	    			{
-		    			Vec2 N = (Vec2){ -0.7071, -0.7071 }; /* normalised vector in northwest direction */
-		    			Vec2 newdp = Vec2Subtract(dp, Vec2Scale(N, Vec2DotProduct(dp, N)));
+	    				Vec2 N, newdp, newdpScaled;
+
+		    			N = NewVec2(-0.7071, -0.7071); /* normalised vector in northwest direction */
+		    			newdp = Vec2Subtract(dp, Vec2Scale(N, Vec2DotProduct(dp, N)));
 		    			printf("bbox inside aforementioned triangle\n");
 		    			printf("dp = <%.2f, %.2f>\nnewdp = <%.2f, %.2f>\n", dp.x, dp.y, newdp.x, newdp.y);
-		    			Vec2 newdpScaled = Vec2Scale(newdp, 2); /* original game has you move faster on slopes */
+		    			newdpScaled = Vec2Scale(newdp, 2); /* original game has you move faster on slopes */
 		    			newPos = Vec2Add(p->pos, newdpScaled);
 	    			}
 	    		}
@@ -243,7 +250,7 @@ void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* statu
 	}
 
 	/* handle movement of bbox */
-    p->bbox = (Rect){ p->pos.x, p->pos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT };
+    p->bbox = NewRect(p->pos.x, p->pos.y + PLAYER_BBOX_Y_OFFSET, PLAYER_BBOX_WIDTH, PLAYER_BBOX_HEIGHT);
 
     /* handle movement of check bbox */
     p->checkBbox = calcCheckBbox(p);
@@ -265,8 +272,10 @@ void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* statu
 	        	}
 	        	else
 	        	{
+	        		SDL_bool maxChecks;
+
 	                tb->msgToDraw = obj->msgs[obj->checkCount];
-	                SDL_bool maxChecks = obj->checkCount >= obj->msgsLen - 1;
+	                maxChecks = obj->checkCount >= obj->msgsLen - 1;
 	                if (maxChecks) printf("DEBUG: UpdatePlayer: max checks (%i) on interactable %i\n", obj->msgsLen, i);
 	                else ++obj->checkCount;
 	        	}
@@ -307,25 +316,34 @@ void UpdatePlayer(Player* p, Room* room, Textbox* tb, Uint32 vPad, Uint32* statu
 
 int DrawPlayer(Player* p, SDL_Surface* screen, Uint32 status)
 {
-	SDL_bool isDarkWorld = CheckFlag(status, STATUS_IS_DARK_WORLD);
-    SDL_Rect srcRect = (SDL_Rect){
+	SDL_bool isDarkWorld;
+	SDL_Rect srcRect;
+	SDL_Surface* sprite;
+	int err;
+
+	isDarkWorld = CheckFlag(status, STATUS_IS_DARK_WORLD);
+    srcRect = NewSDL_Rect(
         p->animFrame*PLAYER_SPRITE_WIDTH, p->facing*PLAYER_SPRITE_HEIGHT,
         PLAYER_SPRITE_WIDTH, PLAYER_SPRITE_HEIGHT
-    };
+    );
     /* TEMP this probably should not be reassigned each frame */
-    SDL_Surface* sprite = (isDarkWorld)? p->dwSprite : p->lwSprite;
-    int err = BlitSurfaceCoords(sprite, &srcRect, screen, p->pos);
+    sprite = (isDarkWorld)? p->dwSprite : p->lwSprite;
+    err = BlitSurfaceCoords(sprite, &srcRect, screen, p->pos);
     return err;
 }
 
 int DrawPlayerGizmos(Player* p, SDL_Surface* screen)
 {
+	SDL_Rect bboxGfx, checkGfx;
+	Uint32 bboxColour;
+	int err;
+
     /* TEMP creating rectangle of bbox */
-    SDL_Rect bboxGfx = (SDL_Rect){ p->bbox.x, p->bbox.y, p->bbox.w, p->bbox.h };
-    SDL_Rect checkGfx = (SDL_Rect){ p->checkBbox.x, p->checkBbox.y, p->checkBbox.w, p->checkBbox.h };
+    bboxGfx = NewSDL_Rect(p->bbox.x, p->bbox.y, p->bbox.w, p->bbox.h);
+    checkGfx = NewSDL_Rect(p->checkBbox.x, p->checkBbox.y, p->checkBbox.w, p->checkBbox.h);
     /* bbox is grey if noclip, green if collisions enabled */
-	Uint32 bboxColour = (p->noclip)?  SDL_MapRGB(screen->format, 220, 220, 220) : SDL_MapRGB(screen->format, 0, 255, 0);
-    int err = SDL_FillRect(screen, &bboxGfx, bboxColour);
+	bboxColour = (p->noclip)?  SDL_MapRGB(screen->format, 220, 220, 220) : SDL_MapRGB(screen->format, 0, 255, 0);
+    err = SDL_FillRect(screen, &bboxGfx, bboxColour);
     err = SDL_FillRect(screen, &checkGfx, SDL_MapRGB(screen->format, 0, 255, 255));
     return err;
 }

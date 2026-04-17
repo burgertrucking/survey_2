@@ -37,7 +37,7 @@ typedef enum InputButton
 
     VKEY_ACCEPT_B_HELD = 1 << 23,
     VKEY_CANCEL_B_HELD = 1 << 24,
-    VKEY_MENU_B_HELD = 1 << 25,
+    VKEY_MENU_B_HELD = 1 << 25
 
 } InputButton;
 

@@ -9,18 +9,24 @@
 	#include "game.c"
 	#include "statusbf.h"
 	#include "bitflag.c"
+	#include "pw_sdl.c"
 #else
 	#define GAME_STANDALONE /* include the implementation in a static build */
 	#include "game.c"
 #endif /* ENABLE_HOT_RELOADING */
 
-int logError(int err, const char* callerFn);
+int logError(int err, const char* callerFn)
+{
+	fprintf(stderr, "WARNING: %s returned error: `%s`\n", callerFn, SDL_GetError());
+	return err;
+}
 
 /* TODO figure out sdl_main to circumvent the need for this */
 int main(int argc, char* argv[])
 /* int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) */
 {
 	int err = 0;
+	GameState state;
 	#ifdef ENABLE_HOT_RELOADING
         err = LoadGameDll();
         if (err) return err; /* error message propagation done in LoadGameDll(), just need to return value */
@@ -30,7 +36,6 @@ int main(int argc, char* argv[])
 	/* init */
 	err = SDL_Init(SDL_INIT_EVERYTHING);
 	if (err) return logError(err, "SDL_Init in main");
-	GameState state;
 	#ifdef ENABLE_HOT_RELOADING
 		err = gameDll.InitGame(&state);
 	#else
@@ -58,11 +63,5 @@ int main(int argc, char* argv[])
 	/* quit */
 	SDL_Quit();
 
-	return err;
-}
-
-int logError(int err, const char* callerFn)
-{
-	fprintf(stderr, "WARNING: %s returned error: `%s`\n", callerFn, SDL_GetError());
 	return err;
 }

@@ -13,6 +13,7 @@ typedef struct Rect
 } Rect;
 
 /* Rect functions */
+Rect NewRect(float x, float y, float w, float h);
 SDL_bool RectCheckCollisions(Rect a, Rect b);
 
 typedef struct Vec2
@@ -22,6 +23,8 @@ typedef struct Vec2
 } Vec2;
 
 /* Vec2 functions */
+Vec2 NewVec2(float x, float y);
+Vec2 Vec2Zero(void);
 Vec2 Vec2Add(Vec2 a, Vec2 b);
 Vec2 Vec2Subtract(Vec2 a, Vec2 b);
 Vec2 Vec2Scale(Vec2 v, float scale);
@@ -35,6 +38,9 @@ typedef struct String
     char* data;
     unsigned int len;
 } String;
+
+/* String functions */
+String NewString(char* data);
 
 /* TEMP macro versions */
 /*

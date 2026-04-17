@@ -50,7 +50,6 @@ HDEF int HandleHotReload(void);
 /* implementation */
 #ifdef HOTRELOAD_IMPL
 
-#include "SDL.h"
 #include <stdio.h>
 
 #ifdef __unix
@@ -60,7 +59,6 @@ HDEF int HandleHotReload(void);
     HDEF void* LoadLibProc(void* h, const char* n) { return dlsym(h, n); }
     HDEF int FreeLib(void* h) { return dlclose(h); }
     HDEF const char* GetLibError(void) { return dlerror(); }
-/* NOTE: windows currently untested */
 #elif defined(_WIN32)
     /* MSVC expects windows.h to be included in its entirety */
     /* NOTE: MSVC is currently untested */
@@ -79,16 +77,17 @@ HDEF int HandleHotReload(void);
     HDEF const char* tempPath = "_temp.dll";
     HDEF HMODULE LoadLib(LPCSTR f)
     {
-        #define FPLEN 128
-        static BOOL gotPath = FALSE;
+        enum { FPLEN = 128 };
+        static BOOL gotPath = FALSE, err;
         static char filePath[FPLEN]; /* path to game dll */
 
         if (!gotPath)
         {
+            int i;
+
             /* get path of executable */
             GetModuleFileNameA(NULL, filePath, FPLEN);
             /* truncate exe name */
-            int i;
             for (i = FPLEN; i >= 0; --i)
             {
                 if (filePath[i] == '\\')
@@ -102,7 +101,7 @@ HDEF int HandleHotReload(void);
             gotPath = TRUE;
         }
  
-        BOOL err = CopyFile(filePath, tempPath, FALSE); /* make a copy of the dll file to get around locks */
+        err = CopyFile(filePath, tempPath, FALSE); /* make a copy of the dll file to get around locks */
         if (err != 0)
             return LoadLibrary(tempPath);
         else
@@ -128,8 +127,10 @@ HDEF int HandleHotReload(void);
 
 HDEF int LoadGameDll(void)
 {
-    const size_t len = 128;
-    char err[len];
+    enum { FPLEN = 128 };
+    char err[FPLEN];
+    ProcHandle initptr, updateptr;
+
     gameDll.handle = LoadLib(dllPath);
     if (!gameDll.handle)
     {
@@ -137,8 +138,8 @@ HDEF int LoadGameDll(void)
         fprintf(stderr, "Failed to load dll, error: `%s`\n", err);
         return 1;
     }
-    ProcHandle initptr = LoadLibProc(gameDll.handle, "InitGame");
-    ProcHandle updateptr = LoadLibProc(gameDll.handle, "UpdateDrawFrame");
+    initptr = LoadLibProc(gameDll.handle, "InitGame");
+    updateptr = LoadLibProc(gameDll.handle, "UpdateDrawFrame");
     if (!initptr || !updateptr)
     {
         sprintf(err, "%s", GetLibError());

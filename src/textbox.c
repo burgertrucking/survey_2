@@ -5,7 +5,7 @@
 #include "statusbf.h"
 #include "utils.h"
 
-static const String errorMsg = (String){ "You FUCKED up the room messages\nIDIOT", 37 };
+static const String errorMsg = { "You FUCKED up the room messages\nIDIOT", 37 };
 
 int InitTextbox(Textbox* tb)
 {
@@ -60,14 +60,17 @@ int DrawTextbox(Textbox* tb, RoomMessage* msgs, SDL_bool isDW, Fonts* fnt, SDL_S
     int err = 0;
     if (tb->shouldDraw)
     {
+        const Vec2 textStart = {29*2, 170*2};
         String msgSlice;
+        int font, tbrecty;
+        SDL_Rect tbrect;
+
         if (tb->msgToDraw == -1) msgSlice = errorMsg;
         else msgSlice = msgs[tb->msgToDraw].msg;
-        int font = (isDW)? FONT_MAIN_DW : FONT_MAIN_LW;
-        int tbrecty = (isDW)? 0 : 167;
-        SDL_Rect tbrect = (SDL_Rect){ 0, tbrecty, 593, 167 };
-        err = BlitSurfaceCoords(tb->graphic, &tbrect, screen, (Vec2){24, 312});
-        const Vec2 textStart = (Vec2){29*2, 170*2}; /* start position for textboxes */
+        font = (isDW)? FONT_MAIN_DW : FONT_MAIN_LW;
+        tbrecty = (isDW)? 0 : 167;
+        tbrect = NewSDL_Rect(0, tbrecty, 593, 167);
+        err = BlitSurfaceCoords(tb->graphic, &tbrect, screen, NewVec2(24, 312));
         msgSlice.len = tb->charsDrawn;
         err = DrawText(msgSlice, fnt, screen, font, textStart);
     }

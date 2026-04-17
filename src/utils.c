@@ -11,15 +11,19 @@ SDL_Surface* LoadImage(const char* file)
 
 int BlitSurfaceCoords(SDL_Surface* src, SDL_Rect* srcRect, SDL_Surface* dst, Vec2 pos)
 {
-    SDL_Rect dstRect = (SDL_Rect){ pos.x, pos.y, 0, 0 };
+    SDL_Rect dstRect;
+    dstRect.x = pos.x; dstRect.y = pos.y;
+    dstRect.w = dstRect.h = 0;
     return SDL_BlitSurface(src, srcRect, dst, &dstRect);
 }
 
 int BlitSurfaceScaled(SDL_Surface* src, SDL_Rect* srcRect, SDL_Surface* dst, Vec2 pos, Vec2 scale)
 {
-    SDL_Rect dims;
+    SDL_Rect dims, dstRect;
+    Uint16 w, h;
+
     dims = (srcRect)? *srcRect : src->clip_rect;
-    Uint16 w = dims.w*scale.x, h = dims.h*scale.y;
+    w = dims.w*scale.x; h = dims.h*scale.y;
     /* TEMP dimension validation: will force an incorrect but working stretch if invalid */
     if ((pos.x + w) > dst->w)
     {
@@ -31,7 +35,8 @@ int BlitSurfaceScaled(SDL_Surface* src, SDL_Rect* srcRect, SDL_Surface* dst, Vec
         h = dst->h - pos.y;
         fprintf(stderr, "WARNING: BlitSurfaceScaled: Requested stretch height %f too tall, cutting to %i\n", pos.y+h, h);
     }
-    SDL_Rect dstRect = (SDL_Rect){ pos.x, pos.y, w, h };
+    dstRect.x = pos.x; dstRect.y = pos.y;
+    dstRect.w = w; dstRect.h = h;
     /* NOTE using internal api since 1.2 doesn't have a SDL_BlitSurfaceScaled() equivalent */
     return SDL_SoftStretch(src, srcRect, dst, &dstRect);
 }

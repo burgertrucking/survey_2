@@ -15,7 +15,7 @@ typedef enum StatusFlag
 
     /* gameplay related status flags */
     STATUS_IS_DARK_WORLD = 1 << 7,
-    STATUS_IS_CUTSCENE = 1 << 8,
+    STATUS_IS_CUTSCENE = 1 << 8
 } StatusFlag;
 
 #endif /* STATUSBF_H */

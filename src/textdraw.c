@@ -11,7 +11,7 @@ enum
     FONT_IMG_COLS = 30,
 
     TEXT_CHAR_SPACING_DEFAULT = TEXT_CHAR_WIDTH - 1,
-    TEXT_LINE_SPACING_DEFAULT = TEXT_CHAR_HEIGHT + 3,
+    TEXT_LINE_SPACING_DEFAULT = TEXT_CHAR_HEIGHT + 3
 };
 
 /* Calculate the rectangle that clips a given character from the bitmap font */
@@ -31,7 +31,11 @@ int InitFonts(Fonts* fonts)
 
 int DrawText(String msg, Fonts* fontImgs, SDL_Surface* screen, FontType font, Vec2 pos)
 {
+    const int startX = pos.x - TEXT_CHAR_SPACING_DEFAULT;
     SDL_Surface* f;
+    Vec2 charPos;
+    unsigned int i;
+
     switch (font)
     {
         case FONT_MAIN_LW:
@@ -48,9 +52,6 @@ int DrawText(String msg, Fonts* fontImgs, SDL_Surface* screen, FontType font, Ve
         break;
     }
 
-    const int startX = pos.x - TEXT_CHAR_SPACING_DEFAULT;
-    unsigned int i;
-    Vec2 charPos;
     /* null character check allows for rendering strings shorter than their buffer size (eg. when drawing fps) */
     /* TODO log when null character check goes off */
     for (i = 0, charPos.x = startX, charPos.y = pos.y; i < msg.len && msg.data[i] != '\0'; ++i)
@@ -69,11 +70,11 @@ int DrawText(String msg, Fonts* fontImgs, SDL_Surface* screen, FontType font, Ve
     }
 
     return 0;
-};
+}
 
 static SDL_Rect GetCharRect(const char letter)
 {
     int col = letter%FONT_IMG_COLS;
     int row = (letter - col)/FONT_IMG_COLS;
-    return (SDL_Rect){ col*TEXT_CHAR_WIDTH, row*TEXT_CHAR_HEIGHT, TEXT_CHAR_WIDTH, TEXT_CHAR_HEIGHT };
+    return NewSDL_Rect(col*TEXT_CHAR_WIDTH, row*TEXT_CHAR_HEIGHT, TEXT_CHAR_WIDTH, TEXT_CHAR_HEIGHT);
 }

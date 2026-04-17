@@ -12,13 +12,13 @@ enum
     MAX_SLOPES = 32,
     MAX_ROOM_MESSAGES = 64,
     MAX_INTERACTABLES = 64,
-    MAX_INTERACTABLE_CHECKS = 8,
+    MAX_INTERACTABLE_CHECKS = 8
 };
 
 typedef enum RoomSheetType
 {
     ROOM_SHEET_TILEMAP, /* the image is the room's tileset (eg. lw school hallway) */
-    ROOM_SHEET_WHOLE, /* the image is of the room (eg. lw classrooms) */
+    ROOM_SHEET_WHOLE /* the image is of the room (eg. lw classrooms) */
 } RoomSheetType;
 
 typedef struct Tile
@@ -39,7 +39,7 @@ typedef enum SlopeType
     SLOPE_TOP_LEFT,
     SLOPE_TOP_RIGHT,
     SLOPE_BOTTOM_LEFT,
-    SLOPE_BOTTOM_RIGHT,
+    SLOPE_BOTTOM_RIGHT
 } SlopeType;
 typedef struct Slope
 {

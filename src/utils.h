@@ -4,6 +4,7 @@
 #include "SDL.h"
 #include "types.h"
 
+SDL_Rect NewSDL_Rect(Sint16 x, Sint16 y, Uint16 w, Uint16 h);
 /* Load a png image and save it to an SDL_Surface with the same format as the screen */
 SDL_Surface* LoadImage(const char* file);
 /* Convenience wrapper for blitting a surface at a given point */

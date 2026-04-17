@@ -14,7 +14,7 @@ typedef struct Fonts
 typedef enum FontType
 {
     FONT_MAIN_LW,
-    FONT_MAIN_DW,
+    FONT_MAIN_DW
 } FontType;
 
 int InitFonts(Fonts* fonts);

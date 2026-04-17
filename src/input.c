@@ -3,11 +3,12 @@
 
 KeyBinds GetDefaultKeyBinds(void)
 {
-    return (KeyBinds){
-        .up = SDLK_UP, .down = SDLK_DOWN, .left = SDLK_LEFT, .right = SDLK_RIGHT, .accept = SDLK_z, .cancel = SDLK_x, .menu = SDLK_c,
-        .acceptA = SDLK_RETURN, .cancelA = SDLK_RSHIFT, .menuA = SDLK_RCTRL,
-        .acceptB = SDLK_KP_ENTER, .cancelB = SDLK_LSHIFT, .menuB = SDLK_LCTRL,
-    };
+    KeyBinds result;
+    result.up = SDLK_UP; result.down = SDLK_DOWN; result.left = SDLK_LEFT; result.right = SDLK_RIGHT;
+    result.accept = SDLK_z; result.cancel = SDLK_x; result.menu = SDLK_c;
+    result.acceptA = SDLK_RETURN; result.cancelA = SDLK_RSHIFT; result.menuA = SDLK_RCTRL;
+    result.acceptB = SDLK_KP_ENTER; result.cancelB = SDLK_LSHIFT; result.menuB = SDLK_LCTRL;
+    return result;
 }
 
 void PressVInput(Uint32* vPad, InputButton b)
