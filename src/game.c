@@ -8,8 +8,8 @@
 #include "textdraw.h"
 #include "room.h"
 #include "textbox.h"
-#include "statusflag.h"
-#include "constants.h"
+#include "statusbf.h"
+#include "consts.h"
 
 typedef struct UserConfig
 {

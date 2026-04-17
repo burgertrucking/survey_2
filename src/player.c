@@ -3,8 +3,8 @@
 #include "utils.h"
 #include "input.h"
 #include "bitflag.h"
-#include "statusflag.h"
-#include "constants.h"
+#include "statusbf.h"
+#include "consts.h"
 
 /* constants */
 enum

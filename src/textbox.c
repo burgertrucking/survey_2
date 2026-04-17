@@ -2,7 +2,7 @@
 #include "types.h"
 #include "bitflag.h"
 #include "input.h"
-#include "statusflag.h"
+#include "statusbf.h"
 #include "utils.h"
 
 static const String errorMsg = (String){ "You FUCKED up the room messages\nIDIOT", 37 };

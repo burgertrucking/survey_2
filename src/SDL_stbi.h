@@ -106,7 +106,7 @@
 #ifndef SDL_STBIMG_ALLOW_STDIO
   #define STBI_NO_STDIO /* don't need STDIO, will use SDL_RWops to open files */
 #endif
-#include "stb_image.h"
+#include "stbi.h"
 
 /* this allows you to prepend stuff to function signatures, e.g. "static" */
 #ifndef SDL_STBIMG_DEF
@@ -293,7 +293,7 @@ SDL_STBIMG_DEF SDL_Texture* STBIMG_LoadTexture_RW_noSeek(SDL_Renderer* renderer,
 #ifndef SDL_STBIMG_ALLOW_STDIO
   #define STBI_NO_STDIO /* don't need STDIO, will use SDL_RWops to open files */
 #endif
-#include "stb_image.h"
+#include "stbi.h"
 
 /* Note: In the header part above I kept things simple, but here */
 /*       I'm using macros to unify SDL1.2/SDL2 and SDL3 RWops/IOStream code */

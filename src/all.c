@@ -14,6 +14,6 @@
 #define STBI_ONLY_PNG
 #define STBI_NO_LINEAR
 #define STBI_NO_HDR
-#include "SDL_stbimage.h"
+#include "SDL_stbi.h"
 
 #endif /* ALL_C */

@@ -1,6 +1,8 @@
+/* Hot reloading module */
+
 /* header */
-#ifndef HOTRELOAD_H
-#define HOTRELOAD_H
+#ifndef HRELOAD_H
+#define HRELOAD_H
 
 #ifdef HOTRELOAD_IMPL
 #define HDEF static
@@ -43,7 +45,7 @@ HDEF struct GameDll
 HDEF int LoadGameDll(void);
 HDEF int HandleHotReload(void);
 
-#endif /* HOTRELOAD_H */
+#endif /* HRELOAD_H */
 
 /* implementation */
 #ifdef HOTRELOAD_IMPL

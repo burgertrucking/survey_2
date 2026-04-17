@@ -1,5 +1,6 @@
-#ifndef STATUSFLAG_H
-#define STATUSFLAG_H
+/* Status Bitflags */
+#ifndef STATUSBF_H
+#define STATUSBF_H
 
 typedef enum StatusFlag
 {
@@ -17,4 +18,4 @@ typedef enum StatusFlag
     STATUS_IS_CUTSCENE = 1 << 8,
 } StatusFlag;
 
-#endif /* STATUSFLAG_H */
+#endif /* STATUSBF_H */

@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "SDL_stbimage.h"
+#include "SDL_stbi.h"
 
 SDL_Surface* LoadImage(const char* file)
 {

@@ -5,9 +5,9 @@
 
 #ifdef ENABLE_HOT_RELOADING
 	#define HOTRELOAD_IMPL
-	#include "hotreload.h"
+	#include "hreload.h"
 	#include "game.c"
-	#include "statusflag.h"
+	#include "statusbf.h"
 	#include "bitflag.c"
 #else
 	#define GAME_STANDALONE /* include the implementation in a static build */
