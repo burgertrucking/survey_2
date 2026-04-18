@@ -106,6 +106,7 @@ int InitGame(GameState* state)
     err = InitTextbox(&state->textbox);
     /* TEMP init room walls (InitRoom() doesn't handle this) */
     /* NOTE though these sizes are very close to exact, they are still too fat for the player to fit through */
+    SDL_memset(&state->room, 0, sizeof(Room)); /* zero initialise room to prevent UB */
     state->room.wallsLen = 16;
     state->room.walls[0] = NewRect(69, 123, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);
     state->room.walls[1] = NewRect(69, 154, 1.9f*TILE_SIZE, 0.8f*TILE_SIZE);

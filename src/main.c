@@ -9,7 +9,6 @@
 	#include "game.c"
 	#include "statusbf.h"
 	#include "bitflag.c"
-	#include "pw_sdl.c"
 #else
 	#define GAME_STANDALONE /* include the implementation in a static build */
 	#include "game.c"
@@ -22,8 +21,11 @@ int logError(int err, const char* callerFn)
 }
 
 /* TODO figure out sdl_main to circumvent the need for this */
+#ifdef _WIN32
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+#else
 int main(int argc, char* argv[])
-/* int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) */
+#endif /* WIN32 */
 {
 	int err = 0;
 	GameState state;

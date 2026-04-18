@@ -16,6 +16,4 @@
 #define STBI_NO_HDR
 #include "SDL_stbi.h"
 
-#include "pw_sdl.c"
-
 #endif /* ALL_C */

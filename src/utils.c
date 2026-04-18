@@ -1,6 +1,14 @@
 #include "utils.h"
 #include "SDL_stbi.h"
 
+SDL_Rect NewSDL_Rect(Sint16 x, Sint16 y, Uint16 w, Uint16 h)
+{
+    SDL_Rect result;
+    result.x = x; result.y = y; result.w = w; result.h = h;
+    return result;
+}
+
+
 SDL_Surface* LoadImage(const char* file)
 {
     SDL_Surface* orig = STBIMG_Load(file); /* raw loaded image */
